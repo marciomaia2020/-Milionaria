@@ -151,11 +151,13 @@ function renderButtons() {
   var liRandomGameButton = renderRandomGameButton();
   var liSaveGameButton = renderSaveGameButton();
   var liClearSavedGamesButton = renderClearSavedGamesButton();
+  var liExportGamesButton = renderExportGamesButton();
 
   ulButtons.appendChild(liNewGameButton);
   ulButtons.appendChild(liRandomGameButton);
   ulButtons.appendChild(liSaveGameButton);
   ulButtons.appendChild(liClearSavedGamesButton);
+  ulButtons.appendChild(liExportGamesButton);
 
   divButtons.appendChild(ulButtons);
 }
@@ -213,6 +215,45 @@ function renderClearSavedGamesButton() {
   return li;
 }
 
+function renderExportGamesButton() {
+  var li = document.createElement('li');
+  li.classList.add('button');
+
+  var button = document.createElement('button');
+  button.textContent = 'Exportar jogos salvos';
+  button.addEventListener('click', exportSavedGames);
+
+  li.appendChild(button);
+
+  return li;
+}
+
+function exportSavedGames() {
+  if (state.savedGames.length === 0) {
+    alert('Não há jogos salvos para exportar.');
+    return;
+  }
+
+  var csvContent = "data:text/csv;charset=utf-8,";
+  csvContent += "Numeros,Trevos\n";
+
+  state.savedGames.forEach(function(game) {
+    var numbers = game.slice(0, 6).map(number => number.toString().padStart(2, '0')).join(' ');
+    var trevos = game.slice(6, 8).join(' ');
+
+    var row = numbers + ',' + trevos + '\n';
+    csvContent += row;
+  });
+
+  var encodedUri = encodeURI(csvContent);
+  var link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", "jogos_salvos_megamilionaria.csv");
+  document.body.appendChild(link); // Required for FF
+
+  link.click(); // This will download the CSV file
+}
+
 function generateRandomGame() {
   state.currentNumbers = [];
   state.currentTrevos = [];
@@ -267,7 +308,7 @@ function renderSavedGames() {
       var li = document.createElement('li');
 
       var numbers = currentGame.slice(0, 6).map(number => number.toString().padStart(2, '0')).join(' ');
-      var trevos = currentGame.slice(6, 8).join(' '); // Mostra apenas os números dos trevos
+      var trevos = currentGame.slice(6, 8).join(' '); // Mostra apenas os Numeros dos trevos
 
       li.textContent = numbers + ' | ' + trevos;
 
@@ -278,5 +319,31 @@ function renderSavedGames() {
     divSavedGames.appendChild(ul);
   }
 }
+function exportSavedGames() {
+  if (state.savedGames.length === 0) {
+    alert('Não há jogos salvos para exportar.');
+    return;
+  }
+
+  var csvContent = "data:text/csv;charset=utf-8,";
+  csvContent += "Numeros,Trevos\n";
+
+  state.savedGames.forEach(function(game) {
+    var numbers = game.slice(0, 6).map(number => number.toString().padStart(2, '0')).join(','); // Números separados por vírgula
+    var trevos = game.slice(6, 8).join(','); // Trevos separados por vírgula
+
+    var row = numbers + ',' + trevos + '\n';
+    csvContent += row;
+  });
+
+  var encodedUri = encodeURI(csvContent);
+  var link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", "jogos_salvos_megamilionaria.csv");
+  document.body.appendChild(link); // Required for FF
+
+  link.click(); // This will download the CSV file
+}
+
 
 start();
